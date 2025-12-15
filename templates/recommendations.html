@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recommendations - CGI.R</title>
+    <style>
+        /* Reusing your consistent theme */
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --success: #10b981;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        h1 { color: var(--accent); margin-bottom: 10px; }
+        .summary { color: var(--text-muted); margin-bottom: 40px; font-size: 1.1rem; }
+        
+        /* Navigation Links */
+        nav {
+            margin-bottom: 30px;
+        }
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 10px 15px;
+            margin: 0 10px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        nav a:hover {
+            background-color: var(--accent);
+            color: var(--bg-color);
+        }
+
+        /* Gallery Grid */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .car-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .car-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.2);
+        }
+        
+        .car-price {
+            font-size: 1.8rem;
+            color: var(--success);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .car-details {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            border-top: 1px dashed #334155;
+            padding-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .car-details span {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .error-message {
+            color: red;
+            font-size: 1.2rem;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/prediction">Predict</a>
+        <a href="/recommendation">Recommend</a>
+        <a href="/explore">Explore</a>
+        <a href="/contact">Contact</a>
+    </nav>
+
+    <h1>✨ Top {{ total_matches }} AI Recommendations</h1>
+    <p class="summary">Cars matching your exact criteria and budget.</p>
+
+    {% if error_message %}
+        <p class="error-message">{{ error_message }}</p>
+    {% elif recommendations %}
+        <div class="gallery">
+            {% for car in recommendations %}
+            <div class="car-card">
+                <h3>{{ car.brand | title }} {{ car.model | default("", True) | title }} ({{ car.year }})</h3>
+                <p class="car-price">${{ "{:,.0f}".format(car.price|float) }}</p>
+                
+                <div class="car-details">
+                    <div>
+                        <span>⛽ Fuel: {{ car.fueltype | title }}</span>
+                        <span>🛣️ Mileage: {{ "{:,.0f}".format(car.mileage|float) }} km</span>
+                        
+                    </div>
+                    <div>
+                        <span>⚙️ Engine: {{ car.enginesize }} L</span>
+                        <span>✅ Status: {{ car.status | title }}</span>
+                        <span>🚘 Type: {{ car.cartype | title }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+         <p class="error-message">No matches found. Try adjusting your search criteria!</p>
+    {% endif %}
+
+    <a href="/" style="display: block; margin-top: 50px; color: var(--accent); text-decoration: none;">⬅ Start a New Search</a>
+
+</body>
+</html>

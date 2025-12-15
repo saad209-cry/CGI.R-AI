@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explore CGI.R</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 3rem;
+            background: linear-gradient(90deg, var(--accent), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+        
+        .content-card {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 800px;
+            text-align: left;
+        }
+
+        .content-card h2 {
+            color: var(--accent);
+            border-bottom: 1px solid var(--text-muted);
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            margin-bottom: 15px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        ul li::before {
+            content: '✓';
+            color: var(--success); /* Assuming success variable is defined */
+            position: absolute;
+            left: 0;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Explore Our AI Platform</h1>
+    <div class="content-card">
+        <p class="subtitle" style="text-align: center;">CGI.R Auto Intelligence uses predictive models and real-time database filtering to simplify your car search.</p>
+
+        <h2>Our Technology</h2>
+        <ul>
+            <li>Trained on a diverse dataset of cars using Linear Regression to achieve high R-squared scores.</li>
+            <li>Database Filtering: Uses direct SQL queries to a live MySQL database for fast, accurate recommendations based on your budget and preferences.</li>
+            <li>Input Guardrails: Built-in checks prevent impossible values (e.g., extremely low mileage on used cars, historically inaccurate model years) from skewing results.</li>
+        </ul>
+        
+        <h2>How to Use</h2>
+        <p>Choose your path on the home page:</p>
+        <ul>
+            <li>**Predict Price:** Input specific car details (Year, Mileage, Engine Size) to get a single, scientifically predicted market value.</li>
+            <li>**Car Recommendation:** Use the multi-step form to define your ideal car (Budget, Fuel Type, Brand) and receive a list of matching listings from the database.</li>
+        </ul>
+        
+    </div>
+    <a href="/" class="back-link">⬅ Back to Home</a>
+</body>
+</html>

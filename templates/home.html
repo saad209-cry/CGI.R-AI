@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGI.R - Select Option</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--accent), #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .option-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 50px;
+            max-width: 800px;
+        }
+        
+        .option-card {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(56, 189, 248, 0.3);
+        }
+        
+        .option-card h2 {
+            color: var(--accent);
+            font-size: 1.5rem;
+        }
+        
+        .option-card a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 25px;
+            background: linear-gradient(45deg, var(--accent), #3b82f6);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to CGI.R Auto Intelligence</h1>
+    <p class="subtitle">How can we help you today?</p>
+    
+    <div class="option-grid">
+        <div class="option-card">
+            <h2>Option 1: Price Prediction</h2>
+            <p>Know the exact market value of a specific car by entering its specs.</p>
+            <a href="/prediction">Start Prediction 🔮</a>
+        </div>
+        
+        <div class="option-card">
+            <h2>Option 2: Car Recommendation</h2>
+            <p>Find a list of cars from our database that fit your budget and preferences.</p>
+            <a href="/recommendation">Start Filtering 🎯</a>
+        </div>
+    </div>
+</body>
+</html>

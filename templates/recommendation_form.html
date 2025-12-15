@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CGI.R - Multi-Step AI Recommendation</title>
+    <style>
+        /* --- Styles (same as before) --- */
+        :root {
+            --bg-color: #0f172a;       
+            --card-bg: #1e293b;        
+            --accent: #38bdf8;         
+            --gradient-end: #a855f7;   
+            --text-main: #f1f5f9;      
+            --text-muted: #94a3b8;     
+            --glass-bg: rgba(30, 41, 59, 0.5); 
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            background: linear-gradient(90deg, var(--accent), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            margin-top: 5px;
+        }
+        
+        /* Navigation Links */
+        nav {
+            margin-bottom: 30px;
+        }
+        nav a {
+            color: var(--text-main);
+            text-decoration: none;
+            padding: 10px 15px;
+            margin: 0 10px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        nav a:hover {
+            background-color: var(--accent);
+            color: var(--bg-color);
+        }
+
+        /* --- 2. PROGRESS BAR STYLING (Adjusted for 5 steps) --- */
+        #progress-bar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+        }
+
+        .progress-bar-line {
+            position: absolute;
+            height: 2px;
+            background-color: var(--text-muted);
+            width: calc(100% - 100px); /* Adjusted width for fewer steps */
+            left: 50px;
+            top: 25px;
+            z-index: 5;
+        }
+
+        .step-indicator {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            transition: all 0.5s;
+        }
+
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 1.2rem;
+            border: 2px solid var(--text-muted);
+            background-color: var(--card-bg);
+            transition: all 0.5s;
+        }
+
+        .step-indicator.completed .step-circle {
+            background-color: var(--gradient-end);
+            border-color: var(--gradient-end);
+            color: var(--bg-color);
+        }
+        
+        .step-indicator.active .step-circle {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px var(--accent);
+            background: linear-gradient(45deg, var(--accent), var(--gradient-end));
+            color: var(--bg-color);
+            transform: scale(1.1);
+        }
+
+        /* --- 3. GLASSMORHISM CONTAINER & STEP STYLING --- */
+        #form-steps-container {
+            width: 90%;
+            max-width: 600px;
+            min-height: 450px; 
+            background-color: var(--glass-bg);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px); 
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden; 
+        }
+
+        .form-step {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 30px;
+            box-sizing: border-box;
+            transition: all 0.5s cubic-bezier(0.86, 0, 0.07, 1);
+            z-index: 5;
+            opacity: 0; 
+            transform: translateX(100%); 
+        }
+
+        .form-step.active {
+            opacity: 1;
+            transform: translateX(0); 
+            z-index: 6;
+            position: relative;
+        }
+        
+        .form-step.previous {
+            opacity: 0.2; 
+            filter: blur(2px);
+            pointer-events: none; 
+            transform: translateX(-100%); 
+        }
+
+
+        /* --- 4. FORM ELEMENTS (Consistent Styling) --- */
+        h2 { color: var(--accent); margin-top: 0; font-size: 1.8rem; }
+
+        .form-group { margin-bottom: 25px; }
+        
+        label { display: block; margin-bottom: 8px; color: var(--text-main); font-weight: bold; }
+
+        input[type="range"], input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--bg-color);
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: linear-gradient(45deg, var(--accent), #3b82f6);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+        
+        .navigation-buttons button:last-child {
+            margin-left: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-wrapper">
+        <header>
+            <h1>CGI.R Auto Intelligence</h1>
+            <p class="subtitle">Find Cars Matching Your Preferences</p>
+        </header>
+        
+        <nav>
+            <a href="/">Home</a>
+            <a href="/prediction">Predict</a>
+            <a href="/recommendation">Recommend</a>
+            <a href="/explore">Explore</a>
+            <a href="/contact">Contact</a>
+        </nav>
+
+
+        <div id="progress-bar-container">
+            <div class="progress-bar-line"></div>
+            <div class="step-indicator active" data-step="1"><div class="step-circle">💰</div><span>Budget</span></div>
+            <div class="step-indicator" data-step="2"><div class="step-circle">🚗</div><span>Brand</span></div>
+            <div class="step-indicator" data-step="3"><div class="step-circle">⛽</div><span>Fuel Type</span></div>
+            <div class="step-indicator" data-step="4"><div class="step-circle">🛻</div><span>Car Type</span></div>
+            <div class="step-indicator" data-step="5"><div class="step-circle">✔</div><span>Condition</span></div>
+        </div>
+
+        <form id="recommendation-form" action="/recommend" method="post">
+            <div id="form-steps-container">
+
+                <div class="form-step active" data-step="1">
+                    <h2>💰 Step 1: What's your budget range?</h2>
+                    <div class="form-group">
+                        <label for="budget_min">Minimum Price ($)</label>
+                        <input type="number" id="budget_min" name="budget_min" value="10000" min="5000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="budget_max">Maximum Price ($)</label>
+                        <input type="number" id="budget_max" name="budget_max" value="40000" min="10000" required>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button type="button" onclick="manageStep(1, 2)">Next: Brand</button>
+                    </div>
+                </div>
+
+                <div class="form-step" data-step="2">
+                    <h2>🚗 Step 2: Preferred Car Brand</h2>
+                    <div class="form-group">
+                        <label for="brand">Brand Preference</label>
+                        <select id="brand" name="brand">
+                            <option value="ANY" selected>Any Brand</option>
+                            {% for brand in features.brands %}
+                                <option value="{{ brand }}">{{ brand | title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button type="button" onclick="manageStep(2, 1)">Back</button>
+                        <button type="button" onclick="manageStep(2, 3)">Next: Fuel Type</button>
+                    </div>
+                </div>
+
+                <div class="form-step" data-step="3">
+                    <h2>⛽ Step 3: Preferred Fuel Type</h2>
+                    <div class="form-group">
+                        <label for="fueltype">Fuel Type</label>
+                        <select id="fueltype" name="fueltype">
+                            {% for fuel in features.fueltypes %}
+                                <option value="{{ fuel }}">{{ fuel | title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button type="button" onclick="manageStep(3, 2)">Back</button>
+                        <button type="button" onclick="manageStep(3, 4)">Next: Car Type</button>
+                    </div>
+                </div>
+                
+                <div class="form-step" data-step="4">
+                    <h2>🛻 Step 4: Vehicle Style</h2>
+                    <div class="form-group">
+                        <label for="cartype">Car Type</label>
+                        <select id="cartype" name="cartype">
+                            {% for type in features.cartypes %}
+                                <option value="{{ type }}">{{ type | title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button type="button" onclick="manageStep(4, 3)">Back</button>
+                        <button type="button" onclick="manageStep(4, 5)">Next: Condition</button>
+                    </div>
+                </div>
+                
+                <div class="form-step" data-step="5">
+                    <h2>✔ Step 5: Car Condition (Status)</h2>
+                    <div class="form-group">
+                        <label for="condition">Car Condition</label>
+                        <select id="condition" name="condition">
+                            {% for status in features.statuses %}
+                                <option value="{{ status }}">{{ status | title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button type="button" onclick="manageStep(5, 4)">Back</button>
+                        <button type="submit" onclick="showLoading()">Recommend The Cars</button>
+                    </div>
+                </div>
+
+                <div id="results-loading-screen" class="form-step" data-step="6">
+                    <h2>🎉 Searching Database...</h2>
+                    <p>Fetching and filtering listings from MySQL to find your best matches.</p>
+                    <div style="margin-top: 30px; font-size: 2rem; color: var(--accent);">
+                        ... Loading Results ...
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const totalSteps = 5; // Reduced from 7 to 5
+
+        function manageStep(currentStep, nextStep) {
+            
+            // Basic Form Validation (Example: Check Budget range)
+            if (nextStep > currentStep && currentStep === 1) {
+                const min = parseInt(document.getElementById('budget_min').value);
+                const max = parseInt(document.getElementById('budget_max').value);
+                if (min >= max || min < 0) {
+                    alert("Please enter a valid price range (Minimum must be less than Maximum and greater than 0).");
+                    return; // Stop transition
+                }
+            }
+
+            const currentStepEl = document.querySelector('.form-step[data-step="' + currentStep + '"]');
+            const nextStepEl = document.querySelector('.form-step[data-step="' + nextStep + '"]');
+            
+            const currentIndicatorEl = document.querySelector('.step-indicator[data-step="' + currentStep + '"]');
+            const nextIndicatorEl = document.querySelector('.step-indicator[data-step="' + nextStep + '"]');
+            
+            // 1. Manage Step Classes for Transition
+            if (nextStep > currentStep) {
+                // Moving FORWARD
+                currentStepEl.classList.remove('active');
+                currentStepEl.classList.add('previous');
+                currentIndicatorEl.classList.remove('active');
+                currentIndicatorEl.classList.add('completed');
+            } else {
+                // Moving BACKWARD
+                currentStepEl.classList.remove('active');
+                currentStepEl.classList.remove('previous');
+                currentIndicatorEl.classList.remove('active');
+                
+                if (nextIndicatorEl) {
+                    nextIndicatorEl.classList.remove('completed');
+                }
+            }
+
+            // 2. Show Next Step (if not the final submission)
+            if (nextStep <= totalSteps) {
+                nextStepEl.classList.add('active');
+                nextIndicatorEl.classList.add('active');
+            }
+        }
+        
+        function showLoading() {
+            // Function called by the final submit button
+            document.getElementById('form-steps-container').style.display = 'none';
+            document.getElementById('results-loading-screen').classList.add('active');
+            document.getElementById('results-loading-screen').style.position = 'relative'; 
+            document.getElementById('results-loading-screen').style.opacity = '1'; 
+        }
+    </script>
+</body>
+</html>
